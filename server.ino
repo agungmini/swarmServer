@@ -1,6 +1,8 @@
 #include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
 
+#define LED 2
+
 const char* ssid = "swarm";
 const char* password = "bismillah";
 
@@ -8,16 +10,17 @@ IPAddress client1(192,168,4,2);
 IPAddress client2(192,168,4,3);
 IPAddress client3(192,168,4,4);
 
-char start0= 'a';
-char start1= 'b';
-char start2= 'c';
-char start3= 'e';
-char stop0= 'd';
+char start0= '{';
+char start1= ')';
+char start2= '(';
+char start3= ']';
+char stop0= '}';
 
 WiFiUDP Udp;
 unsigned int localUdpPort = 4210;  // local port to listen on
 unsigned int espPort= 1112;   //esp port
 char incomingPacket[1024];  // buffer for incoming packets
+boolean ledState= true;
 
 void setup()
 {
@@ -35,6 +38,9 @@ void setup()
   Udp.begin(localUdpPort);
   Serial.print("UDP port, ");
   Serial.println(localUdpPort);
+
+  pinMode(LED,OUTPUT);
+  digitalWrite(LED,HIGH);
 }
 
 void loop()
@@ -51,25 +57,28 @@ void loop()
   if (packetSize)
   {
     // receive incoming UDP packets //for debugging purpose
-    //Serial.print("Received ");
-    //Serial.print(packetSize);
-    //Serial.print(", bytes from ");
-    //Serial.print(Udp.remoteIP());
-    //Serial.print(", at port ");
-    //Serial.println(Udp.remotePort());
-
+    //Serial.print("Received ");  //for debugging purpose
+    //Serial.print(packetSize); //for debugging purpose
+    //Serial.print(", bytes from ");  //for debugging purpose
+    //Serial.print(Udp.remoteIP()); //for debugging purpose
+    //Serial.print(", at port "); //for debugging purpose
+    //Serial.println(Udp.remotePort()); //for debugging purpose
+    //Serial.print("UDP packet contents: ");  //for debugging purpose
+    
     int len = Udp.read(incomingPacket, 255);
     if (len > 0)
     {
       incomingPacket[len] = 0;
     }
-    //Serial.print("UDP packet contents: ");  //for debugging purpose
     Serial.println(incomingPacket);
+    
+    ledState= !ledState;
+    digitalWrite(LED,ledState);
 
     // send back a reply, to the IP address and port we got the packet from //for debugging purpose
-    //Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    //Udp.write(replyPacekt);
-    //Udp.endPacket();
+    //Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());  //for debugging purpose
+    //Udp.write("AKU TELAH MENERIMA");  //for debugging purpose
+    //Udp.endPacket();  //for debugging purpose
   }
 }
 
